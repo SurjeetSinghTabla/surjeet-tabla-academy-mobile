@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   RefreshControl,
   ActivityIndicator,
+  Image,
 } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -19,6 +20,12 @@ import {
   ChevronRight,
   CreditCard,
   GraduationCap,
+  CheckCircle2,
+  Clock,
+  Award,
+  ArrowRight,
+  ShieldCheck,
+  Music,
 } from 'lucide-react-native';
 import { useAuth } from '@/context/AuthContext';
 import { Colors, Fonts } from '@/constants/theme';
@@ -31,6 +38,8 @@ import {
   getCourseLessons,
   getSiteSettings,
 } from '@/lib/sanity';
+
+const SURJEET_HERO_IMG = require('../../../assets/images/surjeet-hero.png');
 
 export default function GurukulHomeScreen() {
   const { user, profile, unlockedTiers, recommendedTier } = useAuth();
@@ -61,7 +70,7 @@ export default function GurukulHomeScreen() {
     loadData();
   }, []);
 
-  // Set default selected tier to recommended tier if student has one
+  // When logged in, select the recommended tier by default if available
   useEffect(() => {
     if (recommendedTier) {
       setSelectedTierKey(recommendedTier);
@@ -89,6 +98,12 @@ export default function GurukulHomeScreen() {
     advanced: 'Tier III: Master Artistry',
   };
 
+  const tierSubtitles: Record<'beginner' | 'intermediate' | 'advanced', string> = {
+    beginner: 'Seating posture, Dayan/Bayan tuning, the 4 Nikas strokes & Teentaal Kaydas',
+    intermediate: 'Left-hand Bayan Meend modulation, rapid Punjab Relas & vocal accompaniment',
+    advanced: 'Odd-time Taals (Rudra 11 beats, Matta 9 beats), Chakradars & concert solos',
+  };
+
   const isSelectedTierUnlocked = unlockedTiers.includes(selectedTierKey);
   const activeLessons = getTierLessons(selectedTierKey);
 
@@ -98,217 +113,401 @@ export default function GurukulHomeScreen() {
         contentContainerStyle={styles.scrollContent}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.gold} />}
       >
-        {/* Top Header */}
+        {/* ========================================================================= */}
+        {/* TOP BRANDING BAR                                                          */}
+        {/* ========================================================================= */}
         <View style={styles.topHeader}>
           <View>
             <View style={styles.badgeRow}>
-              <Text style={styles.badgeText}>SURJEET SINGH GURUKUL</Text>
+              <Text style={styles.badgeText}>SURJEET SINGH DIGITAL GURUKUL</Text>
               <View style={styles.badgeDot} />
             </View>
             <Text style={styles.welcomeTitle}>
-              {profile?.full_name ? `Welcome, ${profile.full_name}` : 'Classical Tabla Gurukul'}
+              {user ? (profile?.full_name ? `Welcome, ${profile.full_name}` : 'Disciple Vault') : 'Classical Tabla Parampara'}
             </Text>
             <Text style={styles.lineageSubtitle}>
-              Punjab Gharana Parampara • Direct Guru Lineage
+              Punjab Gharana Heritage • Direct Guru Lineage
             </Text>
           </View>
 
-          {!user && (
+          {!user ? (
             <TouchableOpacity
               onPress={() => router.push('/(auth)/login')}
-              style={styles.loginPill}
+              style={styles.signInButton}
+              activeOpacity={0.8}
             >
-              <Text style={styles.loginPillText}>Sign In</Text>
+              <Text style={styles.signInButtonText}>Sign In</Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              onPress={() => router.push('/(tabs)/profile')}
+              style={styles.profileBadge}
+              activeOpacity={0.8}
+            >
+              <GraduationCap size={16} color={Colors.gold} />
             </TouchableOpacity>
           )}
         </View>
 
-        {/* Tier Selector Horizontal Pills */}
-        <View style={styles.tierSelector}>
-          {(['beginner', 'intermediate', 'advanced'] as const).map((tKey) => {
-            const isCurrent = selectedTierKey === tKey;
-            const isUnlocked = unlockedTiers.includes(tKey);
-
-            return (
-              <TouchableOpacity
-                key={tKey}
-                onPress={() => setSelectedTierKey(tKey)}
-                style={[
-                  styles.tierPill,
-                  isCurrent && styles.tierPillActive,
-                ]}
-              >
-                {!isUnlocked && <Lock size={10} color={isCurrent ? Colors.obsidian : 'rgba(245, 239, 230, 0.4)'} />}
-                {isUnlocked && <Unlock size={10} color={isCurrent ? Colors.obsidian : Colors.gold} />}
-                <Text
-                  style={[
-                    styles.tierPillText,
-                    isCurrent && styles.tierPillTextActive,
-                  ]}
-                >
-                  {tKey === 'beginner' ? 'Tier I' : tKey === 'intermediate' ? 'Tier II' : 'Tier III'}
+        {/* ========================================================================= */}
+        {/* GUEST VIEW: HERO BANNER & 3-STEP ADMISSION ROADMAP                        */}
+        {/* (Curriculum lessons are hidden until student logs in to their account)     */}
+        {/* ========================================================================= */}
+        {!user ? (
+          <View style={styles.guestContainer}>
+            {/* Visual Hero Banner with Surjeet's authentic portrait */}
+            <View style={styles.heroCard}>
+              <Image
+                source={SURJEET_HERO_IMG}
+                style={styles.heroImage}
+                resizeMode="cover"
+              />
+              <View style={styles.heroOverlay}>
+                <View style={styles.heroTagRow}>
+                  <Text style={styles.heroTagText}>ACADEMY ADMISSION</Text>
+                  <Sparkles size={12} color={Colors.gold} />
+                </View>
+                <Text style={styles.heroHeading}>
+                  Study Authentic Punjab Gharana Tabla
                 </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
+                <Text style={styles.heroSubtext}>
+                  Selective disciple enrollment under virtuoso Surjeet Singh. Every student receives personalized hand posture and stroke evaluations.
+                </Text>
 
-        {/* Active Tier Spotlight Card */}
-        <GlassCard
-          variant={isSelectedTierUnlocked ? 'goldAccent' : 'dark'}
-          intensity={75}
-          style={styles.tierSpotlightCard}
-        >
-          <View style={styles.tierSpotlightHeader}>
-            <View>
-              {selectedTierKey === recommendedTier && (
-                <View style={styles.recommendedBadge}>
-                  <Sparkles size={11} color={Colors.obsidian} />
-                  <Text style={styles.recommendedBadgeText}>Guru Recommended</Text>
-                </View>
-              )}
-              <Text style={styles.tierSpotlightTitle}>
-                {tierNames[selectedTierKey]}
-              </Text>
-              <Text style={styles.tierPriceSubtitle}>
-                Tuition: ₹{tierPrices[selectedTierKey].toLocaleString()} • Lifetime Access
-              </Text>
-            </View>
-
-            <View style={styles.lockBadgeContainer}>
-              {isSelectedTierUnlocked ? (
-                <View style={styles.unlockedIconCircle}>
-                  <Unlock size={18} color={Colors.gold} />
-                </View>
-              ) : (
-                <View style={styles.lockedIconCircle}>
-                  <Lock size={18} color="rgba(245, 239, 230, 0.5)" />
-                </View>
-              )}
-            </View>
-          </View>
-
-          {/* Locked vs Unlocked State Action */}
-          {!isSelectedTierUnlocked ? (
-            <View style={styles.enrollmentBox}>
-              <Text style={styles.enrollmentDesc}>
-                {selectedTierKey === recommendedTier
-                  ? 'Ustad Surjeet Singh assigned you to this tier. Your ₹400 screening fee is credited automatically.'
-                  : 'Master this curriculum tier with HD unlisted video modules, bol notation transcripts, and PDF downloads.'}
-              </Text>
-
-              <View style={styles.creditPriceBreakdown}>
-                <View style={styles.breakdownRow}>
-                  <Text style={styles.breakdownLabel}>Course Price:</Text>
-                  <Text style={styles.breakdownValue}>₹{tierPrices[selectedTierKey].toLocaleString()}</Text>
-                </View>
-                <View style={styles.breakdownRow}>
-                  <Text style={[styles.breakdownLabel, { color: Colors.emerald }]}>
-                    Screening Credit:
-                  </Text>
-                  <Text style={[styles.breakdownValue, { color: Colors.emerald }]}>-₹400</Text>
-                </View>
-                <View style={[styles.breakdownRow, styles.breakdownTotal]}>
-                  <Text style={styles.breakdownTotalLabel}>Net Tuition:</Text>
-                  <Text style={styles.breakdownTotalValue}>
-                    ₹{(tierPrices[selectedTierKey] - 400).toLocaleString()}
+                <View style={styles.quotePill}>
+                  <Text style={styles.quoteText}>
+                    &ldquo;Riyaz karoge toh Raaj karoge.&rdquo;
                   </Text>
                 </View>
               </View>
-
-              <GlassButton
-                title={user ? `Enroll for ₹${(tierPrices[selectedTierKey] - 400).toLocaleString()}` : 'Submit Audition for Admission'}
-                onPress={() => {
-                  if (user) {
-                    router.push('/(tabs)/profile');
-                  } else {
-                    router.push('/(auth)/register-screening');
-                  }
-                }}
-                variant="gold"
-                size="md"
-                icon={<CreditCard size={14} color={Colors.obsidian} />}
-              />
             </View>
-          ) : (
-            <View style={styles.unlockedBanner}>
-              <Text style={styles.unlockedBannerText}>
-                ✓ Tier Active • Ready for Sacred Riyaz
-              </Text>
+
+            {/* 3-STEP ADMISSION PROTOCOL */}
+            <View style={styles.protocolSection}>
+              <View style={styles.sectionHeadingWrapper}>
+                <Text style={styles.sectionSuper}>HOW ADMISSION WORKS</Text>
+                <Text style={styles.sectionHeading}>The 3-Step Admission Protocol</Text>
+                <Text style={styles.sectionLead}>
+                  To uphold the sacred standards of the Punjab Gharana, admission is granted only after a personal audition review by Surjeet Singh.
+                </Text>
+              </View>
+
+              {/* Step 1 Card */}
+              <GlassCard variant="dark" intensity={70} style={styles.stepCard}>
+                <View style={styles.stepHeaderRow}>
+                  <View style={styles.stepBadge}>
+                    <Text style={styles.stepBadgeText}>STEP 01</Text>
+                  </View>
+                  <Text style={styles.stepFeeBadge}>₹400 Screening Fee</Text>
+                </View>
+
+                <Text style={styles.stepTitle}>Submit Audition & Intake Form</Text>
+                <Text style={styles.stepDesc}>
+                  Takes ~2 minutes. Enter your musical background and submit an unlisted video link (YouTube, Drive, or phone recording) showing your hand posture and basic strokes.
+                </Text>
+
+                <View style={styles.stepHighlightRow}>
+                  <CheckCircle2 size={13} color={Colors.gold} />
+                  <Text style={styles.stepHighlightText}>
+                    100% of the ₹400 fee is credited toward your course tuition.
+                  </Text>
+                </View>
+              </GlassCard>
+
+              {/* Step 2 Card */}
+              <GlassCard variant="dark" intensity={70} style={styles.stepCard}>
+                <View style={styles.stepHeaderRow}>
+                  <View style={styles.stepBadge}>
+                    <Text style={styles.stepBadgeText}>STEP 02</Text>
+                  </View>
+                  <View style={styles.stepTimeBadge}>
+                    <Clock size={11} color={Colors.gold} />
+                    <Text style={styles.stepTimeBadgeText}>24–48 Hours</Text>
+                  </View>
+                </View>
+
+                <Text style={styles.stepTitle}>Master Review & Recommendation</Text>
+                <Text style={styles.stepDesc}>
+                  Surjeet Singh personally reviews your audition video, analyzing your Dayan/Bayan balance, wrist ergonomics, and rhythmic sense. He approves your admission and assigns your ideal starting tier.
+                </Text>
+
+                <View style={styles.stepHighlightRow}>
+                  <CheckCircle2 size={13} color={Colors.emerald} />
+                  <Text style={styles.stepHighlightText}>
+                    Receive official acceptance & tier recommendation via email.
+                  </Text>
+                </View>
+              </GlassCard>
+
+              {/* Step 3 Card */}
+              <GlassCard variant="dark" intensity={70} style={styles.stepCard}>
+                <View style={styles.stepHeaderRow}>
+                  <View style={styles.stepBadge}>
+                    <Text style={styles.stepBadgeText}>STEP 03</Text>
+                  </View>
+                  <Text style={styles.stepLifetimeBadge}>Lifetime Access</Text>
+                </View>
+
+                <Text style={styles.stepTitle}>Enroll in Recommended Tier & Unlock Vault</Text>
+                <Text style={styles.stepDesc}>
+                  Create your student login, sign into this app, and purchase your assigned tier. Your ₹400 screening fee is automatically deducted at checkout, granting instant access to all lessons and bol notations.
+                </Text>
+
+                <View style={styles.stepHighlightRow}>
+                  <CheckCircle2 size={13} color={Colors.gold} />
+                  <Text style={styles.stepHighlightText}>
+                    Full access to HD unlisted video modules, bol PDFs & updates.
+                  </Text>
+                </View>
+              </GlassCard>
             </View>
-          )}
-        </GlassCard>
 
-        {/* Curriculum Lessons Section */}
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Curriculum Lessons</Text>
-          <Text style={styles.sectionCount}>
-            {activeLessons.length} {activeLessons.length === 1 ? 'Module' : 'Modules'}
-          </Text>
-        </View>
+            {/* CURRICULUM TIERS OVERVIEW */}
+            <View style={styles.curriculumArchitectureSection}>
+              <Text style={styles.sectionSuper}>CURRICULUM ARCHITECTURE</Text>
+              <Text style={styles.sectionHeading}>The Three Progressive Tiers</Text>
 
-        {loading ? (
-          <ActivityIndicator color={Colors.gold} style={{ marginVertical: 30 }} />
-        ) : activeLessons.length === 0 ? (
-          <GlassCard variant="dark" intensity={60} style={styles.emptyLessonsCard}>
-            <BookOpen size={24} color={Colors.gold} style={{ alignSelf: 'center', marginBottom: 8 }} />
-            <Text style={styles.emptyLessonsTitle}>Lessons Initializing</Text>
-            <Text style={styles.emptyLessonsDesc}>
-              New video lessons published by Ustad Surjeet Singh in Sanity Studio will appear here automatically.
-            </Text>
-          </GlassCard>
-        ) : (
-          <View style={styles.lessonsList}>
-            {activeLessons.map((lesson) => {
-              const isAccessible = isSelectedTierUnlocked;
-
-              return (
-                <TouchableOpacity
-                  key={lesson._id}
-                  activeOpacity={isAccessible ? 0.75 : 0.9}
-                  onPress={() => {
-                    if (isAccessible) {
-                      router.push({
-                        pathname: '/course/[lessonSlug]',
-                        params: { lessonSlug: lesson.slug?.current || lesson._id },
-                      });
-                    } else {
-                      router.push('/(auth)/register-screening');
-                    }
-                  }}
-                  style={[
-                    styles.lessonCard,
-                    isAccessible && styles.lessonCardAccessible,
-                  ]}
-                >
-                  <View style={styles.lessonLeft}>
-                    <View
-                      style={[
-                        styles.playIconContainer,
-                        isAccessible && styles.playIconContainerAccessible,
-                      ]}
+              <View style={styles.tierCardsStack}>
+                {(['beginner', 'intermediate', 'advanced'] as const).map((tKey) => {
+                  const isPopular = tKey === 'intermediate';
+                  return (
+                    <GlassCard
+                      key={tKey}
+                      variant={isPopular ? 'goldAccent' : 'dark'}
+                      intensity={75}
+                      style={styles.tierArchCard}
                     >
-                      {isAccessible ? (
-                        <Play size={14} color={Colors.obsidian} fill={Colors.obsidian} />
-                      ) : (
-                        <Lock size={14} color="rgba(245, 239, 230, 0.4)" />
-                      )}
-                    </View>
+                      <View style={styles.tierArchHeader}>
+                        <View>
+                          <Text style={styles.tierArchName}>{tierNames[tKey]}</Text>
+                          <Text style={styles.tierArchSubtitle}>{tierSubtitles[tKey]}</Text>
+                        </View>
+                        <Text style={styles.tierArchPrice}>₹{tierPrices[tKey].toLocaleString()}</Text>
+                      </View>
 
-                    <View style={styles.lessonDetails}>
-                      <Text style={styles.lessonTaalTag}>
-                        MODULE {lesson.moduleNumber} • {lesson.taal}
+                      <View style={styles.tierArchFooter}>
+                        <View style={styles.tierArchGatedNotice}>
+                          <Lock size={12} color="rgba(245, 239, 230, 0.5)" />
+                          <Text style={styles.tierArchGatedText}>
+                            Lessons unlock upon admission approval & account sign-in
+                          </Text>
+                        </View>
+                      </View>
+                    </GlassCard>
+                  );
+                })}
+              </View>
+            </View>
+
+            {/* GUEST ACTION CTA BUTTONS */}
+            <View style={styles.guestActionContainer}>
+              <GlassButton
+                title="Begin 3-Step Admission (₹400)"
+                onPress={() => router.push('/(auth)/register-screening')}
+                variant="gold"
+                size="lg"
+                icon={<ArrowRight size={16} color={Colors.obsidian} />}
+                style={styles.primaryCta}
+              />
+
+              <TouchableOpacity
+                onPress={() => router.push('/(auth)/login')}
+                style={styles.secondarySignInButton}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.secondarySignInText}>
+                  Already Screened or Accepted? <Text style={styles.secondarySignInBold}>Disciple Sign In</Text>
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        ) : (
+          /* ========================================================================= */
+          /* LOGGED-IN DISCIPLE VIEW: FULL CURRICULUM ACCESS & TIER LMS               */
+          /* ========================================================================= */
+          <View style={styles.discipleContainer}>
+            {/* Disciple Admission Status Card */}
+            <GlassCard
+              variant={isSelectedTierUnlocked ? 'goldAccent' : 'dark'}
+              intensity={75}
+              style={styles.discipleStatusCard}
+            >
+              <View style={styles.statusHeaderRow}>
+                <View>
+                  <View style={styles.statusBadgeRow}>
+                    <ShieldCheck size={14} color={Colors.gold} />
+                    <Text style={styles.statusBadgeText}>ACADEMY DISCIPLE ACCOUNT</Text>
+                  </View>
+                  <Text style={styles.discipleTierTitle}>
+                    {recommendedTier ? `Recommended: ${tierNames[recommendedTier]}` : 'Gurukul Student'}
+                  </Text>
+                </View>
+
+                {isSelectedTierUnlocked ? (
+                  <View style={styles.activeTierPill}>
+                    <CheckCircle2 size={13} color={Colors.emerald} />
+                    <Text style={styles.activeTierPillText}>UNLOCKED</Text>
+                  </View>
+                ) : (
+                  <View style={styles.lockedTierPill}>
+                    <Lock size={12} color={Colors.gold} />
+                    <Text style={styles.lockedTierPillText}>LOCKED</Text>
+                  </View>
+                )}
+              </View>
+
+              {!isSelectedTierUnlocked ? (
+                <View style={styles.enrollmentCreditBox}>
+                  <Text style={styles.enrollmentCreditDesc}>
+                    {selectedTierKey === recommendedTier
+                      ? 'Surjeet Singh approved your admission and assigned you this tier. Your ₹400 screening fee is credited automatically.'
+                      : 'Enroll in this tier to unlock all HD unlisted lessons, bol notation sheets, and PDF downloads.'}
+                  </Text>
+
+                  <View style={styles.creditPriceBreakdown}>
+                    <View style={styles.breakdownRow}>
+                      <Text style={styles.breakdownLabel}>Course Tuition:</Text>
+                      <Text style={styles.breakdownValue}>₹{tierPrices[selectedTierKey].toLocaleString()}</Text>
+                    </View>
+                    <View style={styles.breakdownRow}>
+                      <Text style={[styles.breakdownLabel, { color: Colors.emerald }]}>
+                        Screening Fee Credit:
                       </Text>
-                      <Text numberOfLines={1} style={styles.lessonTitle}>
-                        {lesson.title}
+                      <Text style={[styles.breakdownValue, { color: Colors.emerald }]}>-₹400</Text>
+                    </View>
+                    <View style={[styles.breakdownRow, styles.breakdownTotal]}>
+                      <Text style={styles.breakdownTotalLabel}>Net Amount Due:</Text>
+                      <Text style={styles.breakdownTotalValue}>
+                        ₹{(tierPrices[selectedTierKey] - 400).toLocaleString()}
                       </Text>
                     </View>
                   </View>
 
-                  <ChevronRight size={16} color="rgba(245, 239, 230, 0.3)" />
-                </TouchableOpacity>
-              );
-            })}
+                  <GlassButton
+                    title={`Unlock for ₹${(tierPrices[selectedTierKey] - 400).toLocaleString()}`}
+                    onPress={() => router.push('/(tabs)/profile')}
+                    variant="gold"
+                    size="md"
+                    icon={<CreditCard size={14} color={Colors.obsidian} />}
+                  />
+                </View>
+              ) : (
+                <View style={styles.activeTierBanner}>
+                  <Text style={styles.activeTierBannerText}>
+                    ✓ All modules active • Tap any lesson below to begin riyaz
+                  </Text>
+                </View>
+              )}
+            </GlassCard>
+
+            {/* Tier Selector Horizontal Pills */}
+            <View style={styles.tierSelector}>
+              {(['beginner', 'intermediate', 'advanced'] as const).map((tKey) => {
+                const isCurrent = selectedTierKey === tKey;
+                const isUnlocked = unlockedTiers.includes(tKey);
+
+                return (
+                  <TouchableOpacity
+                    key={tKey}
+                    onPress={() => setSelectedTierKey(tKey)}
+                    style={[
+                      styles.tierPill,
+                      isCurrent && styles.tierPillActive,
+                    ]}
+                  >
+                    {!isUnlocked ? (
+                      <Lock size={10} color={isCurrent ? Colors.obsidian : 'rgba(245, 239, 230, 0.4)'} />
+                    ) : (
+                      <Unlock size={10} color={isCurrent ? Colors.obsidian : Colors.gold} />
+                    )}
+                    <Text
+                      style={[
+                        styles.tierPillText,
+                        isCurrent && styles.tierPillTextActive,
+                      ]}
+                    >
+                      {tKey === 'beginner' ? 'Tier I' : tKey === 'intermediate' ? 'Tier II' : 'Tier III'}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+
+            {/* Curriculum Lessons Section */}
+            <View style={styles.sectionHeader}>
+              <View>
+                <Text style={styles.sectionTitle}>Curriculum Lessons</Text>
+                <Text style={styles.sectionSubtitle}>{tierNames[selectedTierKey]}</Text>
+              </View>
+              <Text style={styles.sectionCount}>
+                {activeLessons.length} {activeLessons.length === 1 ? 'Module' : 'Modules'}
+              </Text>
+            </View>
+
+            {loading ? (
+              <ActivityIndicator color={Colors.gold} style={{ marginVertical: 30 }} />
+            ) : activeLessons.length === 0 ? (
+              <GlassCard variant="dark" intensity={60} style={styles.emptyLessonsCard}>
+                <BookOpen size={24} color={Colors.gold} style={{ alignSelf: 'center', marginBottom: 8 }} />
+                <Text style={styles.emptyLessonsTitle}>Lessons Initializing</Text>
+                <Text style={styles.emptyLessonsDesc}>
+                  Video lessons published by Ustad Surjeet Singh in Sanity Studio will appear here automatically.
+                </Text>
+              </GlassCard>
+            ) : (
+              <View style={styles.lessonsList}>
+                {activeLessons.map((lesson) => {
+                  const isAccessible = isSelectedTierUnlocked;
+
+                  return (
+                    <TouchableOpacity
+                      key={lesson._id}
+                      activeOpacity={isAccessible ? 0.75 : 0.9}
+                      onPress={() => {
+                        if (isAccessible) {
+                          router.push({
+                            pathname: '/course/[lessonSlug]',
+                            params: { lessonSlug: lesson.slug?.current || lesson._id },
+                          });
+                        } else {
+                          router.push('/(tabs)/profile');
+                        }
+                      }}
+                      style={[
+                        styles.lessonCard,
+                        isAccessible && styles.lessonCardAccessible,
+                      ]}
+                    >
+                      <View style={styles.lessonLeft}>
+                        <View
+                          style={[
+                            styles.playIconContainer,
+                            isAccessible && styles.playIconContainerAccessible,
+                          ]}
+                        >
+                          {isAccessible ? (
+                            <Play size={14} color={Colors.obsidian} fill={Colors.obsidian} />
+                          ) : (
+                            <Lock size={14} color="rgba(245, 239, 230, 0.4)" />
+                          )}
+                        </View>
+
+                        <View style={styles.lessonDetails}>
+                          <Text style={styles.lessonTaalTag}>
+                            MODULE {lesson.moduleNumber} • {lesson.taal}
+                          </Text>
+                          <Text numberOfLines={1} style={styles.lessonTitle}>
+                            {lesson.title}
+                          </Text>
+                        </View>
+                      </View>
+
+                      <ChevronRight size={16} color="rgba(245, 239, 230, 0.3)" />
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            )}
           </View>
         )}
       </ScrollView>
@@ -324,7 +523,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 20,
     paddingTop: 10,
-    paddingBottom: 100, // Space for floating bottom tab bar
+    paddingBottom: 110, // Space for floating bottom tab bar
   },
   topHeader: {
     flexDirection: 'row',
@@ -340,7 +539,7 @@ const styles = StyleSheet.create({
   },
   badgeText: {
     fontFamily: Fonts.monoMedium,
-    fontSize: 10,
+    fontSize: 9,
     color: Colors.gold,
     letterSpacing: 1.5,
   },
@@ -352,7 +551,7 @@ const styles = StyleSheet.create({
   },
   welcomeTitle: {
     fontFamily: Fonts.serifSemiBold,
-    fontSize: 26,
+    fontSize: 24,
     color: Colors.ivory,
   },
   lineageSubtitle: {
@@ -361,117 +560,347 @@ const styles = StyleSheet.create({
     color: 'rgba(245, 239, 230, 0.55)',
     marginTop: 2,
   },
-  loginPill: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 16,
+  signInButton: {
+    paddingVertical: 7,
+    paddingHorizontal: 14,
+    borderRadius: 20,
     backgroundColor: 'rgba(197, 160, 89, 0.15)',
     borderWidth: 1,
-    borderColor: 'rgba(197, 160, 89, 0.3)',
+    borderColor: 'rgba(197, 160, 89, 0.35)',
   },
-  loginPillText: {
+  signInButtonText: {
+    fontFamily: Fonts.monoMedium,
+    fontSize: 11,
+    color: Colors.gold,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  profileBadge: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: 'rgba(197, 160, 89, 0.15)',
+    borderWidth: 1,
+    borderColor: 'rgba(197, 160, 89, 0.35)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  /* Guest View Styles */
+  guestContainer: {
+    gap: 24,
+  },
+  heroCard: {
+    borderRadius: 24,
+    overflow: 'hidden',
+    backgroundColor: '#1C191A',
+    borderWidth: 1,
+    borderColor: 'rgba(197, 160, 89, 0.3)',
+    position: 'relative',
+    height: 340,
+    justifyContent: 'flex-end',
+  },
+  heroImage: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: '100%',
+    height: '100%',
+    opacity: 0.72,
+  },
+  heroOverlay: {
+    padding: 20,
+    backgroundColor: 'rgba(20, 18, 19, 0.82)',
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  heroTagRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 6,
+  },
+  heroTagText: {
     fontFamily: Fonts.monoMedium,
     fontSize: 10,
     color: Colors.gold,
-    textTransform: 'uppercase',
+    letterSpacing: 1.5,
   },
-  tierSelector: {
-    flexDirection: 'row',
-    gap: 8,
-    marginBottom: 16,
-  },
-  tierPill: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    paddingVertical: 10,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    borderWidth: 1,
-    borderColor: 'rgba(245, 239, 230, 0.1)',
-  },
-  tierPillActive: {
-    backgroundColor: Colors.gold,
-    borderColor: Colors.goldLight,
-  },
-  tierPillText: {
-    fontFamily: Fonts.monoMedium,
-    fontSize: 11,
-    color: 'rgba(245, 239, 230, 0.65)',
-    textTransform: 'uppercase',
-  },
-  tierPillTextActive: {
-    color: Colors.obsidian,
-    fontFamily: Fonts.monoBold,
-  },
-  tierSpotlightCard: {
-    marginBottom: 24,
-  },
-  tierSpotlightHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 14,
-  },
-  recommendedBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: Colors.gold,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 8,
-    alignSelf: 'flex-start',
-    marginBottom: 6,
-  },
-  recommendedBadgeText: {
-    fontFamily: Fonts.monoBold,
-    fontSize: 9,
-    color: Colors.obsidian,
-    textTransform: 'uppercase',
-  },
-  tierSpotlightTitle: {
+  heroHeading: {
     fontFamily: Fonts.serifSemiBold,
     fontSize: 22,
     color: Colors.ivory,
+    lineHeight: 28,
+    marginBottom: 6,
   },
-  tierPriceSubtitle: {
+  heroSubtext: {
+    fontFamily: Fonts.sansRegular,
+    fontSize: 12,
+    color: 'rgba(245, 239, 230, 0.75)',
+    lineHeight: 17,
+    marginBottom: 10,
+  },
+  quotePill: {
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(197, 160, 89, 0.12)',
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(197, 160, 89, 0.25)',
+  },
+  quoteText: {
+    fontFamily: Fonts.serifItalic,
+    fontSize: 13,
+    color: Colors.gold,
+  },
+
+  /* Protocol Section */
+  protocolSection: {
+    gap: 12,
+  },
+  sectionHeadingWrapper: {
+    marginBottom: 6,
+  },
+  sectionSuper: {
+    fontFamily: Fonts.monoMedium,
+    fontSize: 10,
+    color: Colors.gold,
+    letterSpacing: 1.5,
+    marginBottom: 4,
+  },
+  sectionHeading: {
+    fontFamily: Fonts.serifSemiBold,
+    fontSize: 24,
+    color: Colors.ivory,
+    marginBottom: 6,
+  },
+  sectionLead: {
     fontFamily: Fonts.sansRegular,
     fontSize: 12,
     color: 'rgba(245, 239, 230, 0.65)',
+    lineHeight: 18,
+  },
+  stepCard: {
+    padding: 16,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: 'rgba(245, 239, 230, 0.12)',
+  },
+  stepHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  stepBadge: {
+    backgroundColor: Colors.burgundy,
+    paddingVertical: 3,
+    paddingHorizontal: 8,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: 'rgba(197, 160, 89, 0.3)',
+  },
+  stepBadgeText: {
+    fontFamily: Fonts.monoBold,
+    fontSize: 9,
+    color: Colors.ivory,
+    letterSpacing: 1,
+  },
+  stepFeeBadge: {
+    fontFamily: Fonts.monoMedium,
+    fontSize: 11,
+    color: Colors.gold,
+    fontWeight: '600',
+  },
+  stepTimeBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  stepTimeBadgeText: {
+    fontFamily: Fonts.monoMedium,
+    fontSize: 11,
+    color: Colors.gold,
+  },
+  stepLifetimeBadge: {
+    fontFamily: Fonts.monoMedium,
+    fontSize: 11,
+    color: Colors.emerald,
+  },
+  stepTitle: {
+    fontFamily: Fonts.serifSemiBold,
+    fontSize: 18,
+    color: Colors.ivory,
+    marginBottom: 6,
+  },
+  stepDesc: {
+    fontFamily: Fonts.sansRegular,
+    fontSize: 12,
+    color: 'rgba(245, 239, 230, 0.7)',
+    lineHeight: 18,
+    marginBottom: 10,
+  },
+  stepHighlightRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(245, 239, 230, 0.08)',
+  },
+  stepHighlightText: {
+    fontFamily: Fonts.sansRegular,
+    fontSize: 11,
+    color: 'rgba(245, 239, 230, 0.85)',
+    flex: 1,
+  },
+
+  /* Curriculum Architecture Preview */
+  curriculumArchitectureSection: {
+    gap: 12,
+  },
+  tierCardsStack: {
+    gap: 10,
+  },
+  tierArchCard: {
+    padding: 16,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: 'rgba(197, 160, 89, 0.25)',
+  },
+  tierArchHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 8,
+  },
+  tierArchName: {
+    fontFamily: Fonts.serifSemiBold,
+    fontSize: 18,
+    color: Colors.ivory,
+  },
+  tierArchSubtitle: {
+    fontFamily: Fonts.sansRegular,
+    fontSize: 11,
+    color: 'rgba(245, 239, 230, 0.6)',
     marginTop: 2,
+    maxWidth: 240,
   },
-  lockBadgeContainer: {
-    marginLeft: 10,
+  tierArchPrice: {
+    fontFamily: Fonts.monoBold,
+    fontSize: 16,
+    color: Colors.gold,
   },
-  unlockedIconCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: 'rgba(197, 160, 89, 0.2)',
+  tierArchFooter: {
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(245, 239, 230, 0.08)',
+  },
+  tierArchGatedNotice: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: Colors.gold,
+    gap: 6,
   },
-  lockedIconCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+  tierArchGatedText: {
+    fontFamily: Fonts.monoMedium,
+    fontSize: 10,
+    color: 'rgba(245, 239, 230, 0.5)',
+  },
+
+  /* Guest Action CTAs */
+  guestActionContainer: {
+    gap: 12,
+    paddingTop: 8,
+  },
+  primaryCta: {
+    width: '100%',
+  },
+  secondarySignInButton: {
     alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(245, 239, 230, 0.15)',
+    paddingVertical: 12,
   },
-  enrollmentBox: {
+  secondarySignInText: {
+    fontFamily: Fonts.sansRegular,
+    fontSize: 12,
+    color: 'rgba(245, 239, 230, 0.65)',
+  },
+  secondarySignInBold: {
+    color: Colors.gold,
+    fontFamily: Fonts.sansSemiBold,
+    textDecorationLine: 'underline',
+  },
+
+  /* Logged-in Disciple Styles */
+  discipleContainer: {
+    gap: 20,
+  },
+  discipleStatusCard: {
+    marginBottom: 4,
+  },
+  statusHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 12,
+  },
+  statusBadgeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    marginBottom: 4,
+  },
+  statusBadgeText: {
+    fontFamily: Fonts.monoBold,
+    fontSize: 9,
+    color: Colors.gold,
+    letterSpacing: 1,
+  },
+  discipleTierTitle: {
+    fontFamily: Fonts.serifSemiBold,
+    fontSize: 20,
+    color: Colors.ivory,
+  },
+  activeTierPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(16, 185, 129, 0.3)',
+  },
+  activeTierPillText: {
+    fontFamily: Fonts.monoBold,
+    fontSize: 9,
+    color: Colors.emerald,
+  },
+  lockedTierPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: 'rgba(197, 160, 89, 0.15)',
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(197, 160, 89, 0.3)',
+  },
+  lockedTierPillText: {
+    fontFamily: Fonts.monoBold,
+    fontSize: 9,
+    color: Colors.gold,
+  },
+  enrollmentCreditBox: {
     paddingTop: 12,
     borderTopWidth: 1,
     borderTopColor: 'rgba(245, 239, 230, 0.08)',
   },
-  enrollmentDesc: {
+  enrollmentCreditDesc: {
     fontFamily: Fonts.sansRegular,
     fontSize: 12,
     color: 'rgba(245, 239, 230, 0.7)',
@@ -517,30 +946,66 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.gold,
   },
-  unlockedBanner: {
+  activeTierBanner: {
     paddingVertical: 10,
     paddingHorizontal: 12,
     borderRadius: 10,
-    backgroundColor: 'rgba(197, 160, 89, 0.15)',
+    backgroundColor: 'rgba(197, 160, 89, 0.12)',
     borderWidth: 1,
-    borderColor: 'rgba(197, 160, 89, 0.3)',
+    borderColor: 'rgba(197, 160, 89, 0.25)',
     alignItems: 'center',
   },
-  unlockedBannerText: {
+  activeTierBannerText: {
     fontFamily: Fonts.monoMedium,
     fontSize: 11,
     color: Colors.gold,
   },
+  tierSelector: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  tierPill: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 10,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderWidth: 1,
+    borderColor: 'rgba(245, 239, 230, 0.1)',
+  },
+  tierPillActive: {
+    backgroundColor: Colors.gold,
+    borderColor: Colors.goldLight,
+  },
+  tierPillText: {
+    fontFamily: Fonts.monoMedium,
+    fontSize: 11,
+    color: 'rgba(245, 239, 230, 0.65)',
+    textTransform: 'uppercase',
+  },
+  tierPillTextActive: {
+    color: Colors.obsidian,
+    fontFamily: Fonts.monoBold,
+  },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
+    alignItems: 'flex-end',
+    marginTop: 4,
   },
   sectionTitle: {
     fontFamily: Fonts.serifSemiBold,
-    fontSize: 20,
+    fontSize: 22,
     color: Colors.ivory,
+  },
+  sectionSubtitle: {
+    fontFamily: Fonts.sansRegular,
+    fontSize: 11,
+    color: Colors.gold,
+    marginTop: 2,
   },
   sectionCount: {
     fontFamily: Fonts.monoMedium,

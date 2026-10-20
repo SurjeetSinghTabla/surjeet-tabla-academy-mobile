@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   Linking,
   Alert,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
@@ -19,11 +20,35 @@ import {
   Sparkles,
   Music,
   CheckCircle2,
+  Camera,
 } from 'lucide-react-native';
 import { Colors, Fonts } from '@/constants/theme';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { GlassButton } from '@/components/ui/GlassButton';
 import { getPerformanceWorks, PerformanceWork } from '@/lib/sanity';
+
+const GALLERY_PHOTOS = [
+  {
+    src: require('../../../assets/images/gallery/470682296_18432761506076561_4740777405915033227_n.jpg'),
+    caption: 'Classical Solo Recital • Punjab Gharana',
+  },
+  {
+    src: require('../../../assets/images/gallery/639762287_18509265916076561_3876243902014117663_n.jpg'),
+    caption: 'Vocal Sangat & Harmonium Jugalbandi',
+  },
+  {
+    src: require('../../../assets/images/gallery/683740643_18523457047076561_941756929725314147_n.jpg'),
+    caption: 'Acoustic Stage Setup & Bayan Modulation',
+  },
+  {
+    src: require('../../../assets/images/gallery/706257018_18529122763076561_2437233484309581567_n.jpg'),
+    caption: 'Festival Mehfil • Teentaal Drut Bandish',
+  },
+  {
+    src: require('../../../assets/images/gallery/723663409_18535186444076561_94554391318084790_n.jpg'),
+    caption: 'Gurukul Parampara • Intensive Riyaz',
+  },
+];
 
 export default function RepertoireScreen() {
   const [works, setWorks] = useState<PerformanceWork[]>([]);
@@ -125,6 +150,34 @@ export default function RepertoireScreen() {
             ))}
           </View>
         )}
+
+        {/* Archival Performance Photographic Gallery */}
+        <View style={[styles.sectionHeader, { marginTop: 24 }]}>
+          <View>
+            <Text style={styles.sectionTitle}>Archival Concert Gallery</Text>
+            <Text style={styles.gallerySub}>Live stage recitals & jugalbandi moments</Text>
+          </View>
+          <Text style={styles.sectionCount}>{GALLERY_PHOTOS.length} Photographs</Text>
+        </View>
+
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.galleryScroll}
+        >
+          {GALLERY_PHOTOS.map((photo, index) => (
+            <View key={index} style={styles.galleryCard}>
+              <Image source={photo.src} style={styles.galleryImage} resizeMode="cover" />
+              <View style={styles.galleryScrim}>
+                <View style={styles.galleryTagRow}>
+                  <Camera size={11} color={Colors.gold} />
+                  <Text style={styles.galleryTagText}>PUNJAB GHARANA LIVE</Text>
+                </View>
+                <Text style={styles.galleryCaption}>{photo.caption}</Text>
+              </View>
+            </View>
+          ))}
+        </ScrollView>
 
         {/* 24-Bit Studio Stem Commission Section */}
         <View style={[styles.sectionHeader, { marginTop: 28 }]}>
@@ -304,6 +357,61 @@ const styles = StyleSheet.create({
   },
   worksList: {
     gap: 12,
+  },
+  gallerySub: {
+    fontFamily: Fonts.sansRegular,
+    fontSize: 11,
+    color: 'rgba(245, 239, 230, 0.55)',
+    marginTop: 2,
+  },
+  galleryScroll: {
+    gap: 14,
+    paddingVertical: 6,
+    paddingRight: 20,
+  },
+  galleryCard: {
+    width: 260,
+    height: 180,
+    borderRadius: 18,
+    overflow: 'hidden',
+    backgroundColor: '#1C191A',
+    borderWidth: 1,
+    borderColor: 'rgba(197, 160, 89, 0.25)',
+    position: 'relative',
+    justifyContent: 'flex-end',
+  },
+  galleryImage: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: '100%',
+    height: '100%',
+  },
+  galleryScrim: {
+    padding: 12,
+    backgroundColor: 'rgba(20, 18, 19, 0.85)',
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  galleryTagRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    marginBottom: 3,
+  },
+  galleryTagText: {
+    fontFamily: Fonts.monoBold,
+    fontSize: 8,
+    color: Colors.gold,
+    letterSpacing: 1,
+  },
+  galleryCaption: {
+    fontFamily: Fonts.sansRegular,
+    fontSize: 11,
+    color: Colors.ivory,
+    lineHeight: 15,
   },
   workCard: {
     padding: 14,

@@ -36,7 +36,7 @@ export default function MasterclassScreen() {
   const [settings, setSettings] = useState<SiteSettings>(FALLBACK_SITE_SETTINGS);
   const [studentName, setStudentName] = useState(profile?.full_name || '');
   const [studentEmail, setStudentEmail] = useState(user?.email || '');
-  const [focusTopic, setFocusTopic] = useState('Bayan Modulation & Left-Hand Meend');
+  const [focusTopic, setFocusTopic] = useState('');
   const [loading, setLoading] = useState(false);
   const [isPaid, setIsPaid] = useState(false);
 
@@ -51,17 +51,9 @@ export default function MasterclassScreen() {
     if (user?.email && !studentEmail) setStudentEmail(user.email);
   }, [profile, user]);
 
-  const topics = [
-    'Bayan Modulation & Left-Hand Meend',
-    'Odd-Time Signatures: Rudra Taal 11 Beats',
-    'Vocal & Kirtan Sangat Accompaniment Craft',
-    'Rapid Punjab Relas & Finger Independence',
-    'Farshbandi Chakradars & Tihai Mathematics',
-  ];
-
   const handleBookSession = async () => {
-    if (!studentName || !studentEmail) {
-      Alert.alert('Required', 'Please enter your name and email.');
+    if (!studentName || !studentEmail || !focusTopic.trim()) {
+      Alert.alert('Required', 'Please enter your name, email, and focus topic.');
       return;
     }
 
@@ -176,28 +168,14 @@ export default function MasterclassScreen() {
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Focus Topic</Text>
-                <View style={styles.topicOptions}>
-                  {topics.map((t) => (
-                    <TouchableOpacity
-                      key={t}
-                      onPress={() => setFocusTopic(t)}
-                      style={[
-                        styles.topicPill,
-                        focusTopic === t && styles.topicPillActive,
-                      ]}
-                    >
-                      <Text
-                        style={[
-                          styles.topicPillText,
-                          focusTopic === t && styles.topicPillTextActive,
-                        ]}
-                      >
-                        {t}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
+                <Text style={styles.inputLabel}>Focus Topic *</Text>
+                <TextInput
+                  value={focusTopic}
+                  onChangeText={setFocusTopic}
+                  placeholder="e.g. Left-hand Bayan modulation, Punjab Relas, or specific composition"
+                  placeholderTextColor="rgba(245, 239, 230, 0.3)"
+                  style={styles.textInput}
+                />
               </View>
 
               <GlassButton
@@ -369,29 +347,6 @@ const styles = StyleSheet.create({
     color: Colors.ivory,
     fontFamily: Fonts.sansRegular,
     fontSize: 13,
-  },
-  topicOptions: {
-    gap: 6,
-  },
-  topicPill: {
-    padding: 10,
-    borderRadius: 10,
-    backgroundColor: 'rgba(255, 255, 255, 0.04)',
-    borderWidth: 1,
-    borderColor: 'rgba(245, 239, 230, 0.08)',
-  },
-  topicPillActive: {
-    backgroundColor: 'rgba(197, 160, 89, 0.15)',
-    borderColor: Colors.gold,
-  },
-  topicPillText: {
-    fontFamily: Fonts.sansRegular,
-    fontSize: 11,
-    color: 'rgba(245, 239, 230, 0.7)',
-  },
-  topicPillTextActive: {
-    color: Colors.gold,
-    fontFamily: Fonts.sansSemiBold,
   },
   bookButton: {
     marginTop: 8,

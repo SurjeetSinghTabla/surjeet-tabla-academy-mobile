@@ -15,7 +15,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import YoutubePlayer from 'react-native-youtube-iframe';
 import {
   ArrowLeft,
-  RotateCcw,
   BookOpen,
   Download,
   ExternalLink,
@@ -37,7 +36,6 @@ export default function LessonDetailScreen() {
   const [lessons, setLessons] = useState<CourseLesson[]>([]);
   const [activeLesson, setActiveLesson] = useState<CourseLesson | null>(null);
   const [loading, setLoading] = useState(true);
-  const [riyazCount, setRiyazCount] = useState(0);
   const [videoPlaying, setVideoPlaying] = useState(false);
 
   useEffect(() => {
@@ -83,7 +81,6 @@ export default function LessonDetailScreen() {
 
   const navigateToLesson = (lesson: CourseLesson) => {
     setActiveLesson(lesson);
-    setRiyazCount(0);
   };
 
   const handleDownloadPdf = () => {
@@ -153,32 +150,6 @@ export default function LessonDetailScreen() {
 
           <Text style={styles.lessonTitle}>{activeLesson.title}</Text>
         </View>
-
-        {/* Riyaz Repetition Counter Pill */}
-        <GlassCard variant="dark" intensity={70} style={styles.riyazCounterCard}>
-          <View style={styles.counterRow}>
-            <View>
-              <Text style={styles.counterLabel}>LESSON RIYAZ COUNTER</Text>
-              <Text style={styles.counterCount}>{riyazCount} Repetitions</Text>
-            </View>
-
-            <View style={styles.counterActions}>
-              <TouchableOpacity
-                onPress={() => setRiyazCount((prev) => prev + 1)}
-                style={styles.plusOneButton}
-              >
-                <Text style={styles.plusOneText}>+1 Avartan</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                onPress={() => setRiyazCount(0)}
-                style={styles.resetCounterButton}
-              >
-                <RotateCcw size={14} color="rgba(245, 239, 230, 0.6)" />
-              </TouchableOpacity>
-            </View>
-          </View>
-        </GlassCard>
 
         {/* Bol Notation Sheet Card */}
         <GlassCard variant="goldAccent" intensity={70} style={styles.bolNotationCard}>
@@ -367,48 +338,6 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.serifSemiBold,
     fontSize: 24,
     color: Colors.ivory,
-  },
-  riyazCounterCard: {
-    marginBottom: 16,
-  },
-  counterRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  counterLabel: {
-    fontFamily: Fonts.monoMedium,
-    fontSize: 9,
-    color: Colors.gold,
-    letterSpacing: 1,
-  },
-  counterCount: {
-    fontFamily: Fonts.serifSemiBold,
-    fontSize: 18,
-    color: Colors.ivory,
-    marginTop: 2,
-  },
-  counterActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  plusOneButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-    backgroundColor: Colors.gold,
-  },
-  plusOneText: {
-    fontFamily: Fonts.monoBold,
-    fontSize: 11,
-    color: Colors.obsidian,
-    textTransform: 'uppercase',
-  },
-  resetCounterButton: {
-    padding: 8,
-    borderRadius: 8,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
   },
   bolNotationCard: {
     marginBottom: 20,

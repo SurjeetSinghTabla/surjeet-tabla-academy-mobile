@@ -19,12 +19,6 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="practice"
-        options={{
-          title: 'Riyaz',
-        }}
-      />
-      <Tabs.Screen
         name="masterclass"
         options={{
           title: '1-on-1',

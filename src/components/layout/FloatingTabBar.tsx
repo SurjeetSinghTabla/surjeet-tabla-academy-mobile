@@ -3,7 +3,6 @@ import { View, TouchableOpacity, Text, StyleSheet, Platform } from 'react-native
 import { BlurView } from 'expo-blur';
 import {
   GraduationCap,
-  Music,
   Video,
   Disc3,
   User,
@@ -26,8 +25,6 @@ export function FloatingTabBar({ state, descriptors, navigation }: FloatingTabBa
     switch (routeName) {
       case 'index':
         return <GraduationCap size={size} color={color} />;
-      case 'practice':
-        return <Music size={size} color={color} />;
       case 'masterclass':
         return <Video size={size} color={color} />;
       case 'repertoire':
@@ -43,8 +40,6 @@ export function FloatingTabBar({ state, descriptors, navigation }: FloatingTabBa
     switch (routeName) {
       case 'index':
         return 'Gurukul';
-      case 'practice':
-        return 'Riyaz';
       case 'masterclass':
         return '1-on-1';
       case 'repertoire':

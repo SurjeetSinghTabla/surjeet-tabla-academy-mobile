@@ -1,0 +1,43 @@
+{
+  "expo": {
+    "name": "Surjeet Singh Tabla Gurukul",
+    "slug": "surjeet-tabla-academy",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "surjeettabla",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#141213",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.surjeetsingh.gurukul"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#141213",
+        "foregroundImage": "./assets/images/android-icon-foreground.png"
+      },
+      "package": "com.surjeetsingh.gurukul",
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#141213",
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 120
+        }
+      ],
+      "expo-secure-store",
+      "expo-font"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

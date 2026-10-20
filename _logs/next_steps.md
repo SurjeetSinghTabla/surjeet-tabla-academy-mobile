@@ -36,5 +36,6 @@
 - [x] Implement Lesson Player:
   - `src/app/course/[lessonSlug].tsx` (YouTube video player, Bol Notation, PDF attachments, Riyaz count)
 - [x] Run TypeScript verification (`tsc --noEmit` passing with 0 errors)
+- [x] Align project to Expo SDK 57 for 100% Expo Go Play Store compatibility (`21/21 expo-doctor checks passed`)
 - [ ] Connect Razorpay native mobile SDK when production merchant keys are issued
 - [ ] Build standalone iOS & Android production binaries via EAS (`eas build`)

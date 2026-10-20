@@ -37,5 +37,11 @@
   - `src/app/course/[lessonSlug].tsx` (YouTube video player, Bol Notation, PDF attachments, Riyaz count)
 - [x] Run TypeScript verification (`tsc --noEmit` passing with 0 errors)
 - [x] Align project to Expo SDK 57 for 100% Expo Go Play Store compatibility (`21/21 expo-doctor checks passed`)
+- [x] Remove dedicated Riyaz tab, metronome, and lesson riyaz counters per user instruction
+- [x] Convert Masterclass focus topic from selection dropdown to freeform text input on both website and mobile app
+- [x] Implement clear 3-Step Admission Protocol and hero portrait on mobile Gurukul screen
+- [x] Strictly gate curriculum lessons: only visible to authenticated students; guests see admission roadmap and tier architecture
+- [x] Embed authentic photographic concert gallery into mobile archive tab
+- [x] Commit and push all changes to both `surjeet-tabla-academy` and `surjeet-tabla-academy-mobile` git repositories
 - [ ] Connect Razorpay native mobile SDK when production merchant keys are issued
 - [ ] Build standalone iOS & Android production binaries via EAS (`eas build`)

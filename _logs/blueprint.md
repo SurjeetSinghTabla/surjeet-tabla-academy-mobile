@@ -31,10 +31,9 @@
 - `_layout.tsx`: Root Stack, Font Loader, Supabase AuthProvider, Theme Provider
 - `(auth)/login.tsx`: Student Sign In & Guru-gated account creation
 - `(auth)/register-screening.tsx`: ₹400 Serious-Learner Screening Form & Hosted Audition Link
-- `(tabs)/_layout.tsx`: Suspended Apple Frosted Glass Tab Bar
-- `(tabs)/index.tsx`: "Gurukul" — Student Home, Active Tier Progress & 3 Tiers Catalog
-- `(tabs)/practice.tsx`: "Riyaz Studio" — Interactive Bol Reader & 16-Matra Metronome Pulse
-- `(tabs)/masterclass.tsx`: "1-on-1 Sangat" — Live Mentorship Booking & Google Calendar WebView
-- `(tabs)/repertoire.tsx`: "Archive" — Surjeet's Concert Recitals & 24-Bit Stem Requests
-- `(tabs)/profile.tsx`: "My Account" — Enrolled Tiers, Receipts & Sign Out
-- `course/[lessonSlug].tsx`: Fullscreen Lesson Player (`react-native-youtube-iframe`), Bol Notation sheet, Riyaz Counter, PDF Download
+- `(tabs)/_layout.tsx`: Suspended Apple Frosted Glass Tab Bar (4 Tabs: Gurukul, 1-on-1, Archive, Disciple)
+- `(tabs)/index.tsx`: "Gurukul" — Student Home, 3-Step Admission Protocol for Guests, Gated Curriculum Modules for Logged-In Disciples
+- `(tabs)/masterclass.tsx`: "1-on-1 Sangat" — Live Mentorship Booking (Freeform Focus Topic Input) & Google Calendar WebView
+- `(tabs)/repertoire.tsx`: "Archive" — Surjeet's Concert Recitals, Archival Photographic Gallery & 24-Bit Stem Requests
+- `(tabs)/profile.tsx`: "Disciple" — Enrolled Tiers, Admission Status, Receipts & Sign Out
+- `course/[lessonSlug].tsx`: Fullscreen Lesson Player (`react-native-youtube-iframe`), Bol Notation sheet, PDF Download
